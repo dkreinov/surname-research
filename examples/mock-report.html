@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Silbermann — Surname History Report (Mock Example)</title>
+<style>
+  :root {
+    --paper:#f4f2ec; --paper-raise:#fbfaf6; --ink:#2b2620; --ink-soft:#5c5548; --ink-faint:#8a8172;
+    --gold:#9a7b2d; --gold-soft:#c9b483; --rule:#ddd7c8;
+    --chip-high-bg:#e4ead9; --chip-high-fg:#4a5c33; --chip-med-bg:#ece4d0; --chip-med-fg:#7a6428;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:"Segoe UI",system-ui,sans-serif;
+  }
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.65;font-size:1.05rem;margin:0}
+  .page{max-width:46rem;margin:0 auto;padding:3rem 1.5rem 4rem}
+  header.masthead{text-align:center;border-bottom:3px double var(--gold);padding-bottom:2rem;margin-bottom:2.6rem}
+  .crown{font-size:1.6rem;color:var(--gold);letter-spacing:.5em;margin-bottom:1rem}
+  .eyebrow{font-family:var(--sans);font-size:.72rem;text-transform:uppercase;letter-spacing:.22em;color:var(--ink-faint);margin-bottom:.8rem}
+  h1{font-size:clamp(2.6rem,8vw,4rem);font-weight:400;letter-spacing:.04em;line-height:1.05;margin:0 0 .5rem}
+  .cyrillic{font-size:1.25rem;color:var(--ink-soft);letter-spacing:.12em}
+  .thesis{font-size:1.15rem;font-style:italic;color:var(--ink-soft);max-width:36rem;margin:1.5rem auto 0}
+  section{margin-bottom:2.8rem}
+  h2{font-family:var(--sans);font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);border-bottom:1px solid var(--rule);padding-bottom:.5rem;margin:0 0 1.2rem;display:flex;align-items:baseline;gap:.7rem}
+  p{margin:0 0 1rem}
+  .chip{display:inline-block;font-family:var(--sans);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;padding:.18em .7em;border-radius:2px;vertical-align:middle}
+  .chip.high{background:var(--chip-high-bg);color:var(--chip-high-fg)}
+  .chip.med{background:var(--chip-med-bg);color:var(--chip-med-fg)}
+  .verdict{background:var(--paper-raise);border:1px solid var(--rule);border-top:3px solid var(--gold);padding:1.5rem 1.7rem;margin-bottom:2.8rem}
+  .derivation{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.9rem;font-size:1.1rem;margin:1.5rem 0;text-align:center}
+  .derivation .part{border:1px solid var(--rule);background:var(--paper-raise);padding:.7rem 1.1rem;min-width:8rem}
+  .derivation .part b{display:block;font-size:1.25rem;font-weight:600}
+  .derivation .part span{display:block;font-family:var(--sans);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-top:.3rem}
+  .derivation .op{font-size:1.5rem;color:var(--gold)}
+  .tree-wrap{overflow-x:auto;padding:.5rem 0 1.2rem}
+  .tree-title{font-family:var(--sans);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--ink-soft);text-align:center;margin:1.6rem 0 .2rem}
+  .tree-legend{font-family:var(--sans);font-size:.72rem;color:var(--ink-faint);text-align:center;margin-bottom:.4rem}
+  .tree-legend .solid,.tree-legend .dashed{display:inline-block;width:1.6rem;vertical-align:middle;border-top:1px solid var(--ink-faint);margin:0 .3rem 0 1rem}
+  .tree-legend .dashed{border-top-style:dashed}
+  .tree,.tree ul{list-style:none;margin:0;padding:0;display:flex;justify-content:center;align-items:flex-start}
+  .tree{min-width:max-content;margin:0 auto}
+  .tree ul{padding-top:1.4rem;position:relative}
+  .tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:1px solid var(--gold-soft);height:1.4rem}
+  .tree li{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:1.4rem .4rem 0}
+  .tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:1px solid var(--gold-soft);width:50%;height:1.4rem}
+  .tree li::after{right:auto;left:50%;border-left:1px solid var(--gold-soft)}
+  .tree li:only-child::before,.tree li:only-child::after{display:none}
+  .tree li:first-child::before,.tree li:last-child::after{border-top:0 none}
+  .tree li:last-child::before{border-right:1px solid var(--gold-soft)}
+  .tree li:last-child:not(:only-child)::after{border-left:0 none}
+  .tree>li{padding-top:0}
+  .tree>li::before,.tree>li::after{display:none}
+  .tree li.hyp::after{border-left-style:dashed}
+  .tree li.hyp:last-child::before{border-right-style:dashed}
+  .node{border:1px solid var(--rule);border-top:2px solid var(--gold);background:var(--paper-raise);padding:.5rem .8rem;min-width:7.5rem;max-width:11rem;font-size:.85rem;line-height:1.35}
+  .node b{display:block;font-size:.92rem;font-weight:600}
+  .node span{display:block;font-family:var(--sans);font-size:.68rem;color:var(--ink-faint);margin-top:.2rem}
+  .node .tag{display:inline-block;font-family:var(--sans);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--chip-med-fg);background:var(--chip-med-bg);padding:.12em .55em;margin-top:.3rem;border-radius:2px}
+  .banner{font-family:var(--sans);font-size:.75rem;text-align:center;background:var(--chip-med-bg);color:var(--chip-med-fg);padding:.5em;letter-spacing:.08em}
+</style></head><body>
+<div class="banner">MOCK EXAMPLE — all names, dates, and places below are fictional; layout demonstrates the surname-research skill output</div>
+<div class="page">
+  <header class="masthead">
+    <div class="crown">♛</div>
+    <div class="eyebrow">Family Surname Dossier</div>
+    <h1>Silbermann</h1>
+    <div class="cyrillic">Зильберман &middot; זילברמן</div>
+    <p class="thesis">"Silver man" — an Ashkenazic occupational surname of a silversmith, traced here as a demonstration of the pipeline's output format.</p>
+  </header>
+
+  <div class="verdict">
+    <h2>Verdict at a glance</h2>
+    <p><strong>Silbermann is an Ashkenazic occupational surname</strong> from German/Yiddish <em>Silber</em> ("silver") + <em>Mann</em> — a silversmith or silver trader. In this fictional example, documented lines trace to the towns of <strong>Grodno</strong> and <strong>Pinsk</strong> in the Pale of Settlement.</p>
+  </div>
+
+  <section>
+    <h2>Etymology <span class="chip high">High confidence</span></h2>
+    <div class="derivation">
+      <div class="part"><b>Silber</b><span>German/Yiddish<br>"silver"</span></div>
+      <div class="op">+</div>
+      <div class="part"><b>-mann</b><span>agent suffix<br>"man / craftsman"</span></div>
+      <div class="op">=</div>
+      <div class="part"><b>Silbermann</b><span>"silversmith"</span></div>
+    </div>
+    <p>Occupational surnames were among the most common types adopted when Jews of the Russian and Austrian empires were required to take fixed family names in the early 1800s. Confidence chips mark how each claim survived adversarial verification during the deep-research phase.</p>
+  </section>
+
+  <section>
+    <h2>Family tree from the records <span class="chip med">Reconstructed</span></h2>
+    <div class="tree-legend">documented link<span class="solid"></span>&nbsp; hypothesis / inferred<span class="dashed"></span></div>
+    <div class="tree-title">Grodno line (fictional demonstration)</div>
+    <div class="tree-wrap">
+      <ul class="tree">
+        <li>
+          <div class="node"><b>Mendel</b><span>18th century &middot; Grodno</span><span class="tag">inferred from patronymic</span></div>
+          <ul>
+            <li>
+              <div class="node"><b>Yosef Mendelev</b><span>~1790–1861 &middot; wife Feyga</span></div>
+              <ul>
+                <li>
+                  <div class="node"><b>Aron Yosef</b><span>b. ~1820 &middot; silversmith<br>moved Grodno → Pinsk</span></div>
+                  <ul>
+                    <li><div class="node"><b>Chaim</b><span>b. 1846 &middot; Pinsk</span></div></li>
+                    <li class="hyp"><div class="node"><b>Rivka</b><span>b. ~1850</span><span class="tag">sibling — patronymic match</span></div></li>
+                  </ul>
+                </li>
+                <li><div class="node"><b>Golda</b><span>b. ~1824</span></div></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <p>Solid connectors cite record data (revision lists, vital registers); dashed connectors mark hypotheses from patronymic + geography + date fit, always labeled with the reason.</p>
+  </section>
+</div>
+</body></html>

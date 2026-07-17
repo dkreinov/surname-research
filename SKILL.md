@@ -1,0 +1,65 @@
+---
+name: surname-research
+description: Full surname/family-name research pipeline — deep web research (etymology, origin, notable bearers), JewishGen archival record search via Chrome, cited HTML dossier artifact with family trees, and a raw records file. Use when the user asks to research a surname, family name origin, or build family history. Works best for Ashkenazi/Eastern-European surnames; web-research phase works for any surname.
+---
+
+# Surname Research Pipeline
+
+A proven end-to-end workflow. Output: (1) a designed trilingual HTML dossier (published as an Artifact and/or PDF), (2) `<surname>-records.md` raw archival extracts, (3) family-tree sections reconstructed from records, (4) optionally the user's own documented direct line.
+
+## Phase 1 — Deep web research
+
+1. Run a deep-research workflow (multi-agent fan-out with adversarial claim verification) on: etymology + meaning, geographic/ethnic origin, history, distribution, genealogical record indexes, notable bearers, variant spellings (include Cyrillic/Hebrew forms), interesting historical data.
+2. Read the FULL result from the task output file (notification result truncates).
+3. Useful source patterns: Geneanet surname pages (DAFN2 = Dictionary of American Family Names, Oxford 2022 — pages 403 on direct fetch, use search-indexed mirrors), JewishGen KehilaLinks suffix guides, Russian Wikipedia for notable bearers, j-roots.info forum (Russian Jewish genealogy), Yiddish etymology blogs.
+4. Etymology heuristic for -ovich/-owicz names: check sibling surnames (root + -er, -itz) in DAFN2; metronymics from Yiddish female names are common. Label as inference when no direct dictionary entry exists.
+
+## Phase 2 — HTML dossier
+
+1. Design: archival-dossier treatment — subject-derived palette (e.g. parchment + old gold), serif stack (Palatino), small-caps sans labels, confidence chips (high/medium), double-rule masthead. Both light/dark themes token-driven.
+2. Sections: verdict-at-a-glance → etymology (derivation diagram: name-part + suffix = meaning) → geographic origin → archival records → family trees → notable bearers timeline → variants table → how-to-research-further (ranked) → honest caveats → key sources. Footer: stats.
+3. Keep the canonical file in the project directory (not a temp dir) so future sessions update it.
+4. Optional: trilingual (EN/HE/RU) — wrap each language in `<div class="lang" id="lang-XX">` (full page copy), buttons + small `setLang()` JS toggling `hidden`; Hebrew block gets `dir="rtl"` + scoped RTL CSS (blockquote border side, table alignment, list padding); keep tree containers `dir="ltr"` so connectors don't flip.
+5. Optional hero image via a text-to-image API (e.g. DashScope/Qwen `wan2.2-t2i-flash`: POST image-synthesis with `X-DashScope-Async: enable`, poll `/api/v1/tasks/{id}`) — downscale to ~1100px JPEG q78 and embed as data URI (artifact CSP blocks remote images).
+6. PDF export: build a single-language standalone HTML (strip other lang divs + langbar), then `chrome --headless=new --disable-gpu --no-pdf-header-footer --print-to-pdf=out.pdf file:///...`.
+
+## Phase 3 — JewishGen record search (Chrome)
+
+Requires the user's Chrome + a JewishGen account. Flow and pitfalls:
+
+1. `tabs_context_mcp` → new tab → `https://www.jewishgen.org/databases/all/` (Unified Search; `/databases/unified/` is a 404).
+2. Fill surname, keep "Phonetically Like" (catches spelling variants + Cyrillic transliterations), Search. Results = `jgform.php`, per-database rows with "List N records" buttons.
+3. **Login gate**: record lists need login. Never enter passwords yourself — ask the user. New accounts: email verification + profile completion (real name/address — ask the user for values), then a human review (~24h) gates ONLY Family Finder (JGFF) + Family Tree of the Jewish People; regular databases work immediately after profile submit.
+4. **Popup behavior**: "List N records" buttons open results in NEW tabs on real mouse clicks; JS `.click()` gets popup-blocked. Reliable path: same-tab submit — pick the TIGHTEST matching `<tr>` (sort candidates by textContent length; a loose match grabs a giant ancestor row and fires the wrong form), then `f.target='_self'; HTMLFormElement.prototype.submit.call(f)` (a form input named "submit" shadows the method).
+5. Extract with `get_page_text`. Pagination: "Page N: Records X to Y" buttons (same submit trick). The search form resets after navigation — refill via JS and verify the field value landed before submitting.
+6. Priority databases for Pale-of-Settlement names: Belarus Census & Revision lists, Births/Deaths/Marriages, Duma Voter Lists (1906–12), Vsia Rossiia business directories (occupations!), Lithuania sets (LitvakSIG — incl. **emigration/passport records via Libau**), **Ukraine Births/Deaths groups (Kiev, Kharkov, Odessa — where Pale families moved after 1860s)**, Holocaust sets (Extraordinary Commission, USC Shoah), JOWBR burials, Arolsen Red Line tracing cards.
+7. **Phonetic noise**: cull unrelated variants (check patronymic style — Slavic Christian patronymics on voter lists = different, non-Jewish family).
+8. Save extracts to `<surname>-records.md`: per-database sections, archive references (fond/file numbers, FHL microfilms), a "big picture" synthesis of family nests, follow-ups list.
+
+## Phase 4 — Family trees & chain-tracing
+
+1. Reconstruct sub-trees per geographic nest — do NOT merge unless records connect them.
+2. Patronymics give parent names ("X, son of Y" → father Y; mark reconstructed roots "inferred from patronymic").
+3. Same rare patronymic + same region + fitting dates across record sets = hypothesis sibling link — draw DASHED, label the reason.
+4. **Chain-tracing across databases** (the technique that finds direct lines):
+   - A birth record's (name, birth year, father) can match a death record in ANOTHER city decades later — Pale families migrated to Kiev/Kharkov/Odessa after the 1860s. Match on name + patronymic + computed birth year (±2).
+   - Wives' names recur: a revision-list wife appearing as "mother" in a later birth record in another city confirms the same family.
+   - Grandchildren named after ancestors (Ashkenazi naming: after deceased relatives) corroborate chains.
+   - Civil registers on JewishGen typically END ~1911–1917; a person born in the 1910s–20s sits in a documented family but needs Soviet ZAGS records or family documents (patronymic!) to prove the final link. State the gap honestly.
+5. Pure HTML/CSS tree (CSP blocks libs): nested `<ul class="tree">`, flex, connector pseudo-elements (`li::before/::after` half-width top borders, `::after` border-left drop, `ul::before` parent drop, `li:last-child::before` corner). `.hyp` = dashed. Wrap each tree in `overflow-x:auto`. Node = name + dates/place + source tag.
+6. Revision-list ages = age at revision — write "b. ~YYYY".
+
+## Phase 5 — Fold-in + follow-ups
+
+1. Update dossier with records + trees; republish (same artifact URL).
+2. Standing follow-ups: JGFF/FTJP after review; Yad Vashem central DB (JS-only site — needs browser host permission or manual, prefilled URL `https://yvng.yadvashem.org/index.html?language=en&s_lastName=<NAME>`); Pamyat-Naroda/OBD-Memorial for Soviet WW2 records (same permission caveat); Beider's Dictionary of Jewish Surnames from the Russian Empire (offline); ordering archive scans by fond/file; US immigration (Ellis Island/Ancestry) for emigration-record families; JOWBR full-record pages (headstone photos, sometimes father's Hebrew name).
+3. Ask the user for family testimony (birthplaces, migration, sibling stories) — one fact (a patronymic, a town) can anchor them to a documented nest.
+4. Update this skill with newly discovered pitfalls.
+
+## Environment pitfalls (hard-won)
+
+- Chrome-extension automation is per-site permissioned: new hosts (yadvashem.org, pamyat-naroda.ru, even claude.ai) may be denied — fall back to structural validation / manual links and say so.
+- `fetch()` results in the page context can be blocked by the extension's data filter — same-tab form submit + `get_page_text` is the reliable extraction path.
+- Screenshot API can fail intermittently; `get_page_text` + targeted JS extraction is more robust than pixel work for tables.
+- Headless-Chrome PDF can fail silently — verify the output file's LastWriteTime, retry with `--no-sandbox`.
+- JOWBR full-record URL pattern: `jowbr.php?rec=<DB>_<NNNNNNN>`; results tables are nested — match the tightest row before clicking links, or hand the user the one-click step.
