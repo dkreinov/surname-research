@@ -36,6 +36,25 @@ Requires the user's Chrome + a JewishGen account. Flow and pitfalls:
 7. **Phonetic noise**: cull unrelated variants (check patronymic style — Slavic Christian patronymics on voter lists = different, non-Jewish family).
 8. Save extracts to `<surname>-records.md`: per-database sections, archive references (fond/file numbers, FHL microfilms), a "big picture" synthesis of family nests, follow-ups list.
 
+## Phase 3b — Soviet WW2 military records (pamyat-naroda.ru)
+
+For ancestors born ~1895–1925 in the USSR, military records are often the ONLY online source bridging the
+post-1911 civil-register gap — one soldier's card can name his father (patronymic!) and confirm family stories.
+
+1. **URL-parameter search** (no form needed): `https://pamyat-naroda.ru/heroes/?last_name=Х&first_name=Y&middle_name=Z&group=all&types=<full-type-list>&page=1&grouppersons=1` — Cyrillic only. Needs browser host permission for the site. After several requests the site throws a **symbol CAPTCHA — the user must solve it, never the agent** (hard rule); solving it once anywhere in that Chrome clears the session.
+2. **Person pages** (`person-hero{id}`): the JS globals `documentIds` and `docInfo` expose every document ID and — critically — `hero_last_name` with **all spelling variants the archive grouped** (e.g. Крейнович/Кринович/Крайнович). Search those variants everywhere else too.
+3. **Date tolerance**: recorded birth dates are often weeks off (clerk errors). Match on year + city + patronymic, not exact date. Family memory sometimes beats the presumed date — check BOTH versions the family offers.
+4. **The patronymic is the payload**: "Борисович" = father named Boris → extends the male line a generation instantly. Combine with the Ashkenazi naming custom (children named after DECEASED relatives): a man naming his son after his own father means the father had died — corroborates chains and dates.
+5. **Document types and what they give**:
+   - `nagrady_nagrad_doc` (wartime award docs, esp. 1944–45) — **SCANNED наградной лист with a personal feat description**; richest narrative source, viewable online.
+   - `chelovek_yubileinaya_kartoteka` — 1985 jubilee Order of the Patriotic War = proof the veteran was alive/registered in 1985.
+   - УПК (officer personnel cards) — full biography, parents, wife, education, photo; physical at ЦА МО Podolsk (archive request).
+   - `card_vmf` (navy cards) — physical at ЦВМА Gatchina, exact cabinet/box cited; usually photo + next of kin.
+   - `kld_ran` (wound cards) — physical at military-medical archive; the cited drawer range reveals the spelling the card is filed under.
+   - Unit rosters (`именные списки частей`) can record an **evacuation-town registration** — documentary confirmation of family evacuation stories (e.g. Perm oblast).
+6. **Дорога памяти** photo gallery (same search types): photos are uploaded BY relatives — an existing upload = a living-relative lead; absence = nobody has claimed the memory yet.
+7. Holocaust cross-check: babynyar.org has a searchable API (`/api/v3/names/`); treat empty results as absence-from-index, not proof of survival — but a clean negative on a whole family is still meaningful.
+
 ## Phase 4 — Family trees & chain-tracing
 
 1. Reconstruct sub-trees per geographic nest — do NOT merge unless records connect them.
