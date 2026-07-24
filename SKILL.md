@@ -42,7 +42,7 @@ For ancestors born ~1895–1925 in the USSR, military records are often the ONLY
 post-1911 civil-register gap — one soldier's card can name his father (patronymic!) and confirm family stories.
 
 1. **URL-parameter search** (no form needed): `https://pamyat-naroda.ru/heroes/?last_name=Х&first_name=Y&middle_name=Z&group=all&types=<full-type-list>&page=1&grouppersons=1` — Cyrillic only. Needs browser host permission for the site. After several requests the site throws a **symbol CAPTCHA — the user must solve it, never the agent** (hard rule); solving it once anywhere in that Chrome clears the session.
-2. **Person pages** (`person-hero{id}`): the JS globals `documentIds` and `docInfo` expose every document ID and — critically — `hero_last_name` with **all spelling variants the archive grouped** (e.g. Крейнович/Кринович/Крайнович). Search those variants everywhere else too.
+2. **Person pages** (`person-hero{id}`): the JS globals `documentIds` and `docInfo` expose every document ID and — critically — `hero_last_name` with **all spelling variants the archive grouped** (e.g. Зильберман/Зилберман/Сильберман). Search those variants everywhere else too.
 3. **Date tolerance**: recorded birth dates are often weeks off (clerk errors). Match on year + city + patronymic, not exact date. Family memory sometimes beats the presumed date — check BOTH versions the family offers.
 4. **The patronymic is the payload**: "Борисович" = father named Boris → extends the male line a generation instantly. Combine with the Ashkenazi naming custom (children named after DECEASED relatives): a man naming his son after his own father means the father had died — corroborates chains and dates.
 5. **Document types and what they give**:
