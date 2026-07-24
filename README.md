@@ -53,6 +53,16 @@ Requirements: Claude Code with the Claude-in-Chrome extension (for the archive p
 
 What it will NOT do: enter passwords, solve CAPTCHAs, message people without your approval, or present a hypothesis as documented — every uncertain tree edge stays dashed and labeled.
 
+## Troubleshooting — finished in minutes with no results?
+
+That symptom means the pipeline never actually ran. Check in order:
+
+1. **Is the file at exactly `~/.claude/skills/surname-research/SKILL.md`?** The directory name matters. Cloning the whole repo elsewhere does not install the skill.
+2. **Did Claude print the Phase 0 capability table?** If no table appeared, the skill never loaded — invoke it explicitly: `/surname-research`, or say "use the surname-research skill to research surname X".
+3. **"Browser extension: no" in the table?** The archive phases (JewishGen, WW2 records) are then announced-skipped — but the web-research phase must still run with multiple subagents and 10+ sources. An etymology-only paragraph with 1–2 sources means Phase 1's fan-out didn't happen: say "run the full Phase 1 fan-out with subagents as the skill specifies".
+4. **Expectations**: a full run (research + dossier + archives) takes 30–90 minutes and asks you to log in to sites and solve CAPTCHAs along the way. Minutes-fast = something skipped.
+5. Versions of this skill before the Phase 0 preflight existed silently degraded on machines without the author's toolset — if your copy has no "Phase 0" section, update from this repo.
+
 ## Repo layout
 
 ```

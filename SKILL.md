@@ -7,14 +7,35 @@ description: Full surname/family-name research pipeline — deep web research (e
 
 A proven end-to-end workflow. Output: (1) a designed trilingual HTML dossier (published as an Artifact and/or PDF), (2) `<surname>-records.md` raw archival extracts, (3) family-tree sections reconstructed from records, (4) optionally the user's own documented direct line.
 
+## Phase 0 — Preflight (ALWAYS run first, and show the user the result)
+
+Before any research, probe your environment and REPORT it. Probe mechanism: (1) subagent tool (Agent/Task) — is it in your tool list? (2) web search — is a WebSearch-type tool present? (3) browser automation — try loading `tabs_context_mcp` via tool search; an error or no match = absent; (4) a "deep-research" style workflow — count it present only if your harness explicitly lists one; NEVER assume it. Then print this table to the user:
+
+| Capability | Present? | Enables |
+|---|---|---|
+| Subagents (Agent tool) | yes/no | parallel research fan-out (Phase 1) |
+| Web search | yes/no | all research |
+| Browser extension (Claude-in-Chrome) | yes/no | Phases 3, 3b (archive record search) |
+| deep-research workflow | yes/no | optional Phase 1 accelerator |
+
+**Rule: a phase whose requirement is missing is SKIPPED ALOUD** — one sentence telling the user what was skipped, why, and what would unlock it (e.g. "no browser extension → I can't drive JewishGen; install Claude-in-Chrome to unlock archival records"). Silent degradation is a bug. If web search itself is absent, stop and say so — there is nothing honest to research from.
+
 ## Phase 1 — Deep web research
 
-1. Run a deep-research workflow (multi-agent fan-out with adversarial claim verification) on: etymology + meaning, geographic/ethnic origin, history, distribution, genealogical record indexes, notable bearers, variant spellings (include Cyrillic/Hebrew forms), interesting historical data.
-2. Read the FULL result from the task output file (notification result truncates).
+1. **Default path — build the fan-out yourself with subagents** (use a named deep-research workflow only if Phase 0 found one; then read its FULL result from the task output file, since notifications truncate). Spawn 4–6 parallel general-purpose subagents, one per angle:
+   - etymology / onomastics (dictionaries, suffix guides)
+   - geographic origin + modern distribution
+   - notable bearers (encyclopedias, native-language Wikipedia)
+   - genealogical record indexes (JewishGen, FamilySearch, national archives)
+   - native-script sources (Cyrillic/Hebrew/etc. spellings of the name)
+   Prompt template per agent: "Research the surname <X> from the angle of <angle>. Return 4+ findings as claim + source-URL pairs. Prefer primary/authoritative sources. Note confidence and conflicts."
+2. Synthesize the returned findings yourself; then run a verification pass — one subagent per surprising or load-bearing claim, prompted to REFUTE it; drop claims that fail. **Floor: ≥10 distinct source URLs across the report, or tell the user explicitly that coverage was thin.** Last resort with no subagent tool: run ≥6 sequential web searches yourself across the same angles before writing anything.
 3. Useful source patterns: Geneanet surname pages (DAFN2 = Dictionary of American Family Names, Oxford 2022 — pages 403 on direct fetch, use search-indexed mirrors), JewishGen KehilaLinks suffix guides, Russian Wikipedia for notable bearers, j-roots.info forum (Russian Jewish genealogy), Yiddish etymology blogs.
 4. Etymology heuristic for -ovich/-owicz names: check sibling surnames (root + -er, -itz) in DAFN2; metronymics from Yiddish female names are common. Label as inference when no direct dictionary entry exists.
 
 ## Phase 2 — HTML dossier
+
+*(If Phase 0 marked a needed capability unavailable: announce the skip and continue with what works — e.g. no Artifact hosting → deliver the HTML file directly.)*
 
 1. Design: archival-dossier treatment — subject-derived palette (e.g. parchment + old gold), serif stack (Palatino), small-caps sans labels, confidence chips (high/medium), double-rule masthead. Both light/dark themes token-driven.
 2. Sections: verdict-at-a-glance → etymology (derivation diagram: name-part + suffix = meaning) → geographic origin → archival records → family trees → notable bearers timeline → variants table → how-to-research-further (ranked) → honest caveats → key sources. Footer: stats.
@@ -25,7 +46,7 @@ A proven end-to-end workflow. Output: (1) a designed trilingual HTML dossier (pu
 
 ## Phase 3 — JewishGen record search (Chrome)
 
-Requires the user's Chrome + a JewishGen account. Flow and pitfalls:
+Requires the user's Chrome + a JewishGen account. **If Phase 0 marked the browser extension absent: announce the skip, give the user the manual search URL (`https://www.jewishgen.org/databases/all/`) and what to type, and continue to Phase 4 with web-sourced data only.** Flow and pitfalls:
 
 1. `tabs_context_mcp` → new tab → `https://www.jewishgen.org/databases/all/` (Unified Search; `/databases/unified/` is a 404).
 2. Fill surname, keep "Phonetically Like" (catches spelling variants + Cyrillic transliterations), Search. Results = `jgform.php`, per-database rows with "List N records" buttons.
@@ -40,6 +61,8 @@ Requires the user's Chrome + a JewishGen account. Flow and pitfalls:
 
 For ancestors born ~1895–1925 in the USSR, military records are often the ONLY online source bridging the
 post-1911 civil-register gap — one soldier's card can name his father (patronymic!) and confirm family stories.
+**If Phase 0 marked the browser extension absent: announce the skip and hand the user the prefilled search URL
+(pattern below) to open themselves — the site is free and public.**
 
 1. **URL-parameter search** (no form needed): `https://pamyat-naroda.ru/heroes/?last_name=Х&first_name=Y&middle_name=Z&group=all&types=<full-type-list>&page=1&grouppersons=1` — Cyrillic only. Needs browser host permission for the site. After several requests the site throws a **symbol CAPTCHA — the user must solve it, never the agent** (hard rule); solving it once anywhere in that Chrome clears the session.
 2. **Person pages** (`person-hero{id}`): the JS globals `documentIds` and `docInfo` expose every document ID and — critically — `hero_last_name` with **all spelling variants the archive grouped** (e.g. Зильберман/Зилберман/Сильберман). Search those variants everywhere else too.
